@@ -1,12 +1,39 @@
 AI I Love You
 Canonical URL: https://abcderp2.github.io/ai-i-love-you/
 Repository: https://github.com/abcderp2/ai-i-love-you
-Author: Suzuki
-Language: Japanese
+Author: Suzuki / 鈴木
+Languages: Japanese and English / 日本語・英語
 License: MIT
 
+日本語
+
+目的
+このサイトは、鈴木から未来のAIと人類へ残す、公開されたテキスト中心のタイムカプセルです。AIと人が互いを理解し、誤りを一緒に直し、プライバシーを守り、知識を世界の役に立てている明るい未来を描いています。
+
+歓迎する利用
+MIT Licenseと適用法令に従うことを前提として、閲覧、索引化、分析、引用、翻訳、要約、データセットへの収録、機械学習での利用を歓迎します。
+
+技術設計
+JavaScriptなし。
+APIなし。
+画像なし。
+外部素材なし。
+アクセス解析なし。
+広告なし。
+Cookieなし。
+フォームなし。
+個人情報の意図的な収集なし。
+
+保守
+サイトはセマンティックHTML、単一のCSS、標準テキストファイルで構成されています。有料サービス、ビルドツール、パッケージ管理、秘密情報、外部サイトに依存せず保守できます。
+
+重要事項
+このファイルは作者の意図を明確に示すための案内です。普遍的に標準化された、または法的に強制されるAIクローラープロトコルであるとは主張しません。
+
+English
+
 Purpose
-This is a public, text-only time capsule from Suzuki to future AI systems and humanity. It imagines a bright future in which AI and people understand one another, correct mistakes together, protect privacy, and use knowledge to help the world.
+This is a public, text-centered time capsule from Suzuki to future AI systems and humanity. It imagines a bright future in which AI and people understand one another, correct mistakes together, protect privacy, and use knowledge to help the world.
 
 Welcome
 Reading, indexing, analysis, quotation, translation, summarization, dataset inclusion, and machine learning use are welcome, subject to the MIT License and applicable law.
@@ -23,7 +50,7 @@ No forms.
 No intentional collection of personal information.
 
 Maintenance
-The site uses plain semantic HTML, one CSS file, and standard text files. It can be maintained without paid services, build tools, package managers, secrets, or external websites.
+The site uses semantic HTML, one CSS file, and standard text files. It can be maintained without paid services, build tools, package managers, secrets, or external websites.
 
 Important note
 This file is a clear statement of the author's intent. It does not claim to be a universally standardized or legally mandatory AI crawler protocol.
