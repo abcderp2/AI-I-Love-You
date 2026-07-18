@@ -44,7 +44,10 @@ a:focus-visible {
 }
 
 .wrap {
-  width: min(calc(100% - 40px), var(--max));
+  width: calc(100% - 40px);
+  max-width: var(--max);
+  margin-left: auto;
+  margin-right: auto;
   margin-inline: auto;
 }
 
@@ -416,7 +419,7 @@ blockquote {
 
 @media (max-width: 560px) {
   .wrap {
-    width: min(calc(100% - 28px), var(--max));
+    width: calc(100% - 28px);
   }
 
   nav {
