@@ -31,6 +31,7 @@ REQUIRED_FILES = (
 FORBIDDEN_SITE_EXTENSIONS = {
     ".js",
     ".mjs",
+    ".wasm",
     ".png",
     ".jpg",
     ".jpeg",
@@ -41,6 +42,38 @@ FORBIDDEN_SITE_EXTENSIONS = {
 MAX_HTML_BYTES = 100_000
 MAX_CSS_BYTES = 100_000
 
+RESOURCE_ATTRIBUTES = {
+    "audio": ("src",),
+    "embed": ("src",),
+    "frame": ("src",),
+    "iframe": ("src",),
+    "img": ("src", "srcset"),
+    "input": ("src",),
+    "link": ("href",),
+    "object": ("data",),
+    "script": ("src",),
+    "source": ("src", "srcset"),
+    "track": ("src",),
+    "video": ("src", "poster"),
+}
+EXPECTED_CSP = {
+    "default-src": ("'self'",),
+    "base-uri": ("'none'",),
+    "child-src": ("'none'",),
+    "connect-src": ("'none'",),
+    "font-src": ("'self'",),
+    "form-action": ("'none'",),
+    "frame-src": ("'none'",),
+    "img-src": ("'none'",),
+    "manifest-src": ("'none'",),
+    "media-src": ("'none'",),
+    "object-src": ("'none'",),
+    "script-src": ("'none'",),
+    "style-src": ("'self'",),
+    "worker-src": ("'none'",),
+    "upgrade-insecure-requests": (),
+}
+
 
 class SiteParser(HTMLParser):
     def __init__(self) -> None:
@@ -48,17 +81,16 @@ class SiteParser(HTMLParser):
         self.html_lang = ""
         self.meta: list[dict[str, str]] = []
         self.start_tags: list[tuple[str, dict[str, str]]] = []
-        self.links: list[tuple[str, str]] = []
+        self.links: list[dict[str, str]] = []
         self.ids: list[str] = []
         self.forbidden_tags: list[str] = []
         self.inline_handlers: list[str] = []
+        self.inline_styles: list[str] = []
         self.headings: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         normalized_tag = tag.lower()
-        normalized_attrs = {
-            key.lower(): value or "" for key, value in attrs
-        }
+        normalized_attrs = {key.lower(): value or "" for key, value in attrs}
         self.start_tags.append((normalized_tag, normalized_attrs))
 
         if normalized_tag == "html":
@@ -66,14 +98,25 @@ class SiteParser(HTMLParser):
         if normalized_tag == "meta":
             self.meta.append(normalized_attrs)
         if normalized_tag == "a":
-            self.links.append((normalized_tag, normalized_attrs.get("href", "")))
+            self.links.append(normalized_attrs)
         if "id" in normalized_attrs:
             self.ids.append(normalized_attrs["id"])
-        if normalized_tag in {"script", "iframe", "frame", "object", "embed", "form"}:
+        if normalized_tag in {
+            "base",
+            "embed",
+            "form",
+            "frame",
+            "iframe",
+            "object",
+            "script",
+            "style",
+        }:
             self.forbidden_tags.append(normalized_tag)
         for key in normalized_attrs:
             if key.startswith("on"):
                 self.inline_handlers.append(key)
+            if key == "style":
+                self.inline_styles.append(normalized_tag)
         if normalized_tag in {"h1", "h2", "h3", "h4", "h5", "h6"}:
             self.headings.append(normalized_tag)
 
@@ -87,6 +130,37 @@ def read_text(relative_path: str, errors: list[str]) -> str:
     except UnicodeDecodeError:
         errors.append(f"not UTF-8: {relative_path}")
     return ""
+
+
+def parse_csp(value: str, errors: list[str]) -> dict[str, tuple[str, ...]]:
+    directives: dict[str, tuple[str, ...]] = {}
+    for raw_directive in value.split(";"):
+        tokens = raw_directive.strip().split()
+        if not tokens:
+            continue
+        name = tokens[0].lower()
+        if name in directives:
+            errors.append(f"CSP contains a duplicate directive: {name}")
+            continue
+        directives[name] = tuple(tokens[1:])
+    return directives
+
+
+def resource_references(tag: str, attrs: dict[str, str]) -> list[str]:
+    references: list[str] = []
+    for attribute in RESOURCE_ATTRIBUTES.get(tag, ()):
+        value = attrs.get(attribute, "").strip()
+        if not value:
+            continue
+        if attribute == "srcset":
+            references.extend(
+                candidate.strip().split()[0]
+                for candidate in value.split(",")
+                if candidate.strip()
+            )
+        else:
+            references.append(value)
+    return references
 
 
 def check_required_files(errors: list[str]) -> None:
@@ -106,6 +180,7 @@ def check_html(errors: list[str]) -> None:
     parser = SiteParser()
     try:
         parser.feed(html)
+        parser.close()
     except Exception as exc:
         errors.append(f"index.html could not be parsed: {exc}")
         return
@@ -132,7 +207,6 @@ def check_html(errors: list[str]) -> None:
     title_match = re.search(r"<title>\s*(.*?)\s*</title>", html, re.IGNORECASE | re.DOTALL)
     if not title_match or not title_match.group(1).strip():
         errors.append("index.html must contain a non-empty title")
-
     if not meta_by_name.get("description", "").strip():
         errors.append("index.html must contain a meta description")
 
@@ -143,9 +217,14 @@ def check_html(errors: list[str]) -> None:
     ]
     if canonical_links != [CANONICAL_URL]:
         errors.append("index.html must contain exactly one canonical URL")
-
     if meta_by_name.get("referrer") != "no-referrer":
         errors.append("index.html must set referrer to no-referrer")
+
+    if any(
+        attrs.get("http-equiv", "").strip().lower() == "refresh"
+        for attrs in parser.meta
+    ):
+        errors.append("index.html must not contain a meta refresh redirect")
 
     csp_values = [
         attrs.get("content", "")
@@ -155,43 +234,40 @@ def check_html(errors: list[str]) -> None:
     if len(csp_values) != 1:
         errors.append("index.html must contain exactly one Content-Security-Policy meta element")
     else:
-        csp = csp_values[0]
-        required_directives = (
-            "default-src 'self'",
-            "base-uri 'none'",
-            "connect-src 'none'",
-            "form-action 'none'",
-            "img-src 'none'",
-            "object-src 'none'",
-            "script-src 'none'",
-            "style-src 'self'",
-        )
-        for directive in required_directives:
-            if directive not in csp:
-                errors.append(f"CSP is missing: {directive}")
+        directives = parse_csp(csp_values[0], errors)
+        for name, expected_values in EXPECTED_CSP.items():
+            if directives.get(name) != expected_values:
+                expected = " ".join((name, *expected_values))
+                errors.append(f"CSP must contain exactly: {expected}")
+        for name in sorted(set(directives) - set(EXPECTED_CSP)):
+            errors.append(f"CSP contains an unexpected directive: {name}")
 
     if len(parser.ids) != len(set(parser.ids)):
         errors.append("index.html contains duplicate id values")
-
     if parser.headings.count("h1") != 1:
         errors.append("index.html must contain exactly one h1")
     if "h2" not in parser.headings:
         errors.append("index.html must contain at least one h2")
     if not any(
         attrs.get("lang", "").lower().split("-")[0] == "en"
-        for tag, attrs in parser.start_tags
+        for _tag, attrs in parser.start_tags
     ):
         errors.append("index.html must mark English content with lang=en")
 
     if parser.forbidden_tags:
         errors.append(
-            "index.html contains forbidden executable or stateful tags: "
+            "index.html contains forbidden executable, stateful, or inline-style tags: "
             + ", ".join(sorted(set(parser.forbidden_tags)))
         )
     if parser.inline_handlers:
         errors.append(
             "index.html contains inline event handlers: "
             + ", ".join(sorted(set(parser.inline_handlers)))
+        )
+    if parser.inline_styles:
+        errors.append(
+            "index.html contains inline style attributes on: "
+            + ", ".join(sorted(set(parser.inline_styles)))
         )
     if re.search(r"javascript\s*:", html, re.IGNORECASE):
         errors.append("index.html must not contain javascript URLs")
@@ -207,43 +283,48 @@ def check_html(errors: list[str]) -> None:
         errors.append("index.html must load exactly the local style.css")
 
     for tag, attrs in parser.start_tags:
-        if tag not in {"link", "script", "img", "iframe", "frame", "object", "embed", "audio", "video", "source"}:
-            continue
-        reference = attrs.get("href") or attrs.get("src") or attrs.get("data")
-        if not reference:
-            continue
-        parsed = urlsplit(reference)
-        if parsed.scheme in {"http", "https"} or reference.startswith("//"):
-            is_canonical = tag == "link" and "canonical" in attrs.get("rel", "").lower().split()
-            if not is_canonical:
-                errors.append(f"external runtime resource is not allowed: {reference}")
+        for reference in resource_references(tag, attrs):
+            parsed = urlsplit(reference)
+            if parsed.scheme in {"http", "https"} or reference.startswith("//"):
+                is_canonical = (
+                    tag == "link"
+                    and reference == CANONICAL_URL
+                    and "canonical" in attrs.get("rel", "").lower().split()
+                )
+                if not is_canonical:
+                    errors.append(f"external runtime resource is not allowed: {reference}")
 
-    for tag, href in parser.links:
+    for attrs in parser.links:
+        href = attrs.get("href", "").strip()
         if not href:
             errors.append("an anchor is missing href")
             continue
+
         parsed = urlsplit(href)
         if parsed.scheme or parsed.netloc:
             if parsed.scheme != "https" or parsed.netloc.lower() != "github.com":
                 errors.append(f"external anchor is not allowlisted: {href}")
-            continue
-        if href.startswith("#"):
-            target = href[1:].split("?", 1)[0]
-            if target and target not in parser.ids:
-                errors.append(f"anchor target does not exist: {href}")
-            continue
+        else:
+            relative_path = parsed.path or "index.html"
+            if relative_path.endswith("/"):
+                relative_path += "index.html"
+            target_path = (ROOT / relative_path.lstrip("/")).resolve()
+            try:
+                target_path.relative_to(ROOT.resolve())
+            except ValueError:
+                errors.append(f"anchor leaves the repository: {href}")
+                continue
+            if not target_path.is_file():
+                errors.append(f"local anchor target does not exist: {href}")
+                continue
+            if target_path == (ROOT / "index.html").resolve() and parsed.fragment:
+                if parsed.fragment not in parser.ids:
+                    errors.append(f"anchor target does not exist: {href}")
 
-        relative_path = parsed.path or "index.html"
-        if relative_path.endswith("/"):
-            relative_path += "index.html"
-        target_path = (ROOT / relative_path.lstrip("/")).resolve()
-        try:
-            target_path.relative_to(ROOT.resolve())
-        except ValueError:
-            errors.append(f"anchor leaves the repository: {href}")
-            continue
-        if not target_path.is_file():
-            errors.append(f"local anchor target does not exist: {href}")
+        if attrs.get("target", "").lower() == "_blank":
+            rel_values = set(attrs.get("rel", "").lower().split())
+            if "noopener" not in rel_values:
+                errors.append(f"target=_blank anchor must use rel=noopener: {href}")
 
 
 def check_css(errors: list[str]) -> None:
@@ -258,13 +339,16 @@ def check_css(errors: list[str]) -> None:
         errors.append("style.css must not contain external URLs")
     if "data:" in css.lower():
         errors.append("style.css must not contain data URLs")
+    if re.search(r"expression\s*\(", css, re.IGNORECASE):
+        errors.append("style.css must not contain legacy CSS expressions")
 
 
 def check_local_files(errors: list[str]) -> None:
     for path in ROOT.rglob("*"):
-        if not path.is_file():
+        if path.is_symlink():
+            errors.append(f"symbolic links are not allowed: {path.relative_to(ROOT)}")
             continue
-        if ".git" in path.parts:
+        if not path.is_file() or ".git" in path.parts:
             continue
         if path.suffix.lower() in FORBIDDEN_SITE_EXTENSIONS:
             errors.append(f"forbidden site asset or script: {path.relative_to(ROOT)}")
@@ -327,7 +411,10 @@ def main() -> int:
         return 1
 
     print("PASS: static site quality checks")
-    print("No external runtime resources, scripts, forms, duplicate anchors, or broken local anchors were found.")
+    print(
+        "No external runtime resources, scripts, forms, inline styles, duplicate anchors, "
+        "or broken local anchors were found."
+    )
     return 0
 
 
