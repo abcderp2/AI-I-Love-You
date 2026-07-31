@@ -69,7 +69,9 @@ EXPECTED_CSP = {
     "media-src": ("'none'",),
     "object-src": ("'none'",),
     "script-src": ("'none'",),
+    "script-src-attr": ("'none'",),
     "style-src": ("'self'",),
+    "style-src-attr": ("'none'",),
     "worker-src": ("'none'",),
     "upgrade-insecure-requests": (),
 }
@@ -219,6 +221,15 @@ def check_html(errors: list[str]) -> None:
         errors.append("index.html must contain exactly one canonical URL")
     if meta_by_name.get("referrer") != "no-referrer":
         errors.append("index.html must set referrer to no-referrer")
+
+    permissions_values = [
+        item.get("content", "").strip()
+        for item in parser.meta
+        if item.get("http-equiv", "").strip().lower() == "permissions-policy"
+    ]
+    expected_permissions = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    if permissions_values != [expected_permissions]:
+        errors.append("index.html must declare the restrictive Permissions-Policy meta exactly once")
 
     if any(
         attrs.get("http-equiv", "").strip().lower() == "refresh"
