@@ -98,13 +98,13 @@ Windowsでpython3が使えない場合は、次を使います。
 py scripts/check_site.py
 ~~~
 
-5. 320px幅のスマートフォン、768px幅のタブレット、1280px幅のPCで表示を確認します
+5. 幅280px、320px、360pxのスマートフォン、幅768px、1024pxのタブレット、幅1440pxのPCで表示を確認します
 6. キーボードのTabキー、印刷表示、端末の文字サイズ設定、動きを減らす設定を確認します
 7. Pull Requestの品質確認が成功してからmainへ反映します
 
 変更を戻すときは、GitHubのRevert操作またはgit revertを使います。mainの履歴を書き換える強制push、秘密情報の削除だけで済ませる対応、原因不明の一括置換は行いません。詳しい手順はMAINTENANCE.mdを参照してください。
 
-### 素人やAIが陥りやすい点
+### 初心者やAIが陥りやすい点
 
 - APIキー、パスワード、個人情報をHTML、Markdown、Issue、Pull Requestに貼り付けないでください
 - robots.txtやai.txtはアクセス制御ではなく、秘密情報を守りません
@@ -209,7 +209,7 @@ On Windows, use the following command if python3 is unavailable.
 py scripts/check_site.py
 ~~~
 
-5. Check the page at 320px smartphone width, 768px tablet width, and 1280px PC width
+5. Check the page at 280px, 320px, and 360px smartphone widths; 768px and 1024px tablet widths; and a 1440px desktop width
 6. Check keyboard Tab navigation, print output, device text-size settings, and reduced-motion settings
 7. Merge to main only after the Pull Request quality check succeeds
 
