@@ -23,6 +23,7 @@ REQUIRED_FILES = (
     "ai.txt",
     "sitemap.xml",
     "SECURITY.md",
+    "MAINTENANCE.md",
     "CONTRIBUTING.md",
     "CODE_OF_CONDUCT.md",
     "LICENSE",
@@ -342,6 +343,16 @@ def check_css(errors: list[str]) -> None:
     css = read_text("style.css", errors)
     if not css:
         return
+    if not re.search(r"body\s*\{[^}]*min-width:\s*280px", css, re.IGNORECASE | re.DOTALL):
+        errors.append("style.css must support a 280px viewport")
+    for required_rule in (
+        "@media (max-width: 560px)",
+        "@media (prefers-reduced-motion: reduce)",
+        "@media print",
+    ):
+        if required_rule not in css:
+            errors.append(f"style.css must include {required_rule}")
+
     if "@import" in css.lower():
         errors.append("style.css must not import external or generated styles")
     if re.search(r"url\s*\(", css, re.IGNORECASE):
