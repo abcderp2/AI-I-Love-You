@@ -22,7 +22,7 @@ html {
 
 body {
   margin: 0;
-  min-width: 320px;
+  min-width: 280px;
   background:
     radial-gradient(circle at 20% 0%, rgba(101, 231, 211, 0.09), transparent 32rem),
     radial-gradient(circle at 100% 18%, rgba(156, 188, 255, 0.09), transparent 28rem),
