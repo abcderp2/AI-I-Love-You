@@ -57,9 +57,9 @@ py scripts/check_site.py
 
 確認が成功しても、ブラウザーで次を見ます。
 
-- 320px幅のスマートフォン
-- 768px幅のタブレット
-- 1280px幅のPC
+- 280px、320px、360px幅のスマートフォン
+- 768px、1024px幅のタブレット
+- 1440px幅のPC
 - キーボードのTab操作とフォーカス表示
 - 端末の文字サイズを大きくした状態
 - 動きを減らす設定
@@ -164,9 +164,9 @@ The check covers:
 
 Passing automation does not replace human checks. Inspect:
 
-- 320px smartphone width
-- 768px tablet width
-- 1280px PC width
+- 280px, 320px, and 360px smartphone widths
+- 768px and 1024px tablet widths
+- 1440px desktop width
 - Keyboard Tab use and focus visibility
 - Larger device text settings
 - Reduced-motion setting
