@@ -35,19 +35,19 @@ https://github.com/abcderp2/AI-I-Love-You
 - 公開リポジトリ向けのGitHub Actionsで品質確認を自動化します
 - GitHub Pagesと公開リポジトリ向けの無料機能の範囲で公開と確認を行います
 
-GitHub、GitHub Pages、GitHub Actions、各社AIの無料プランは、仕様、料金、利用上限が将来変更される可能性があります。現在のサイト構成は追加の有料サービスを必要とせず、一般的な無料AIでも、ファイルや差分を貼り付けて変更案とレビューを行いやすい単純な構成です。GitHubへの反映権限がないAIを使う場合は、提案された差分を人がGitHubの画面で確認して反映します。
+GitHub、GitHub Pages、GitHub Actions、各社AIの無料プランは、仕様、料金、利用上限が将来変更される可能性があります。現在のサイトは追加の有料サービスを必要としない単純な構成で、一般的な無料AIにもファイルや差分を提示して、変更案の作成やレビューを依頼しやすくしています。GitHubへの反映権限がないAIを使う場合は、提案された差分を人がGitHubの画面で確認して反映します。
 
 ### AIおよび機械学習での利用
 
 公開ページは、検索エンジンとあらゆるAIに開かれています。MIT Licenseと適用法令に従うことを前提として、閲覧、索引化、利用者の指示による取得、AI検索、検索結果の品質向上、グラウンディング、分析、引用、翻訳、要約、データセットへの収録、機械学習およびモデル開発での利用を歓迎します。
 
-robots.txtは、User-agent: *ですべての良識的なクローラーを許可し、公開資料で確認できるOAI-SearchBot、GPTBot、Claude-User、Claude-SearchBot、ClaudeBot、Google-Extendedも明示しています。個別の記載は作者の歓迎方針を分かりやすくするもので、記載されていないAIを除外するものではありません。
+robots.txtでは、User-agent: *を使ってすべての良識的なクローラーを許可し、公開資料で確認できるOAI-SearchBot、GPTBot、Claude-User、Claude-SearchBot、ClaudeBot、Google-Extendedも明示しています。個別の記載は作者の歓迎方針を分かりやすくするもので、記載されていないAIを除外するものではありません。
 
 クローラー名の確認先は次のとおりです。
 
 - OpenAI: https://developers.openai.com/api/docs/bots
 - Anthropic: https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler
-- Google: https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers
+- Google: https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers
 
 重要な制約があります。Robots Exclusion Protocolのrobots.txtは通常、ホストのルートに置かれた場合に、そのスキーム、ホスト、ポートを対象とします。このサイトはGitHub Pagesのプロジェクトサイトであり、リポジトリのrobots.txtは https://abcderp2.github.io/AI-I-Love-You/robots.txt に公開されます。これは https://abcderp2.github.io/robots.txt ではないため、このリポジトリだけではホスト全体に対する標準的なクローラー制御を保証できません。現在のファイルは、プロジェクトの明示的な公開方針として保持しています。
 
@@ -154,11 +154,11 @@ Public pages are open to search engines and all AI systems. Reading, indexing, u
 
 robots.txt allows all well-behaved crawlers through User-agent: * and also explicitly names OAI-SearchBot, GPTBot, Claude-User, Claude-SearchBot, ClaudeBot, and Google-Extended as documented in public vendor guidance. The named groups clarify the author's welcome and do not exclude unlisted AI systems.
 
-Crawler-token references:
+Crawler documentation references:
 
 - OpenAI: https://developers.openai.com/api/docs/bots
 - Anthropic: https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler
-- Google: https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers
+- Google: https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers
 
 There is an important limitation. Under the Robots Exclusion Protocol, robots.txt normally applies to a scheme, host, and port when it is published at the host root. This GitHub Pages project publishes the repository file at https://abcderp2.github.io/AI-I-Love-You/robots.txt, not at https://abcderp2.github.io/robots.txt. This repository therefore cannot by itself guarantee standard host-wide crawler handling. The file remains useful as an explicit project policy.
 
