@@ -29,13 +29,13 @@ https://github.com/abcderp2/AI-I-Love-You
 - 実行時に読み込む外部ライブラリ、外部フォント、外部画像、埋め込み、第三者素材を使用しません
 - ビルド処理、パッケージ管理、秘密情報、APIキーを必要としません
 - 人、支援技術、検索クローラー、AIが読みやすいセマンティックHTMLを使用します
-- システム標準フォントと軽量なCSSを使い、PC、スマートフォン、タブレットで読みやすく表示します
+- システム標準フォントと軽量なCSSを使い、読み取り幅を制御して、PC、スマートフォン、タブレットで読みやすく表示します
 - JavaScriptに依存しないため、低性能な端末でも基本的な閲覧を継続できます
 - リポジトリ内の標準Pythonだけで品質確認できます
 - 公開リポジトリ向けのGitHub Actionsで品質確認を自動化します
 - GitHub Pagesと公開リポジトリ向けの無料機能の範囲で公開と確認を行います
 
-GitHub、GitHub Pages、GitHub Actions、各社AIの無料プランは、仕様、料金、利用上限が将来変更される可能性があります。現在のサイトは追加の有料サービスを必要としない単純な構成で、一般的な無料AIにもファイルや差分を提示して、変更案の作成やレビューを依頼しやすくしています。GitHubへの反映権限がないAIを使う場合は、提案された差分を人がGitHubの画面で確認して反映します。
+GitHub、GitHub Pages、GitHub Actions、外部AIサービスの仕様、利用条件、無料機能は将来変更される可能性があります。このリポジトリは追加の有料サービスを必要としない単純な構成です。公開ファイルや差分を提示すれば、一般的なAIにも変更案の作成やレビューを依頼できます。GitHubへの反映権限がないAIを使う場合は、提案された差分を人がGitHubの画面で確認して反映します。
 
 ### AIおよび機械学習での利用
 
@@ -140,13 +140,13 @@ The visual design and the published text are kept unchanged unless the intended 
 - No runtime external libraries, fonts, images, embeds, or third-party assets
 - No build process, package manager, secret, or API key
 - Semantic HTML readable by people, assistive technology, crawlers, and AI systems
-- System fonts and lightweight CSS for readable display on PCs, smartphones, and tablets
+- System fonts and lightweight CSS with controlled reading widths for readable display on PCs, smartphones, and tablets
 - No dependence on JavaScript, so basic reading remains available on lower-powered devices
 - Dependency-free static quality checks using standard Python
 - Automated quality checks through GitHub Actions for pull requests and main updates
 - Publication and checks designed for the free features available to public repositories and GitHub Pages
 
-GitHub, GitHub Pages, GitHub Actions, and free AI plans may change their terms, pricing, limits, or behavior. The current site does not require an additional paid service. Its small set of plain-text files lets a typical free AI review pasted files or diffs and propose changes. When an AI has no GitHub write access, a person reviews and applies the proposed diff through GitHub.
+The specifications, terms, and free features of GitHub, GitHub Pages, GitHub Actions, and external AI services may change. This repository is intentionally simple and does not require an additional paid service. Its public files and diffs can be supplied to a general AI for change proposals and review. When an AI has no GitHub write access, a person reviews and applies the proposed diff through GitHub.
 
 ### AI and machine learning use
 
