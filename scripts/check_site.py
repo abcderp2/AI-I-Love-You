@@ -223,14 +223,11 @@ def check_html(errors: list[str]) -> None:
     if meta_by_name.get("referrer") != "no-referrer":
         errors.append("index.html must set referrer to no-referrer")
 
-    permissions_values = [
-        item.get("content", "").strip()
+    if any(
+        item.get("http-equiv", "").strip().lower() == "permissions-policy"
         for item in parser.meta
-        if item.get("http-equiv", "").strip().lower() == "permissions-policy"
-    ]
-    expected_permissions = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
-    if permissions_values != [expected_permissions]:
-        errors.append("index.html must declare the restrictive Permissions-Policy meta exactly once")
+    ):
+        errors.append("index.html must not use an ineffective Permissions-Policy meta element")
 
     if any(
         attrs.get("http-equiv", "").strip().lower() == "refresh"
