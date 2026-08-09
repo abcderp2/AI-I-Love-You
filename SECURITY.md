@@ -8,12 +8,14 @@ AI I Love Youは、攻撃対象領域とデータ収集をできるだけ小さ�
 - フォーム、認証、アカウント、データベース、API、サーバー側処理を使用しません
 - 第三者素材、埋め込み、フレーム、解析タグ、広告、外部フォントを使用しません
 - HTML内に、自己配信のCSS以外の読み込みを拒否するContent Security Policyを記載しています
-- 使わない端末APIをPermissions-Policyで明示しています
+- HTMLのPermissions-Policy metaをセキュリティ防御として扱いません
 - GitHub Actionsはcontentsの読み取りだけを許可し、秘密情報を渡しません
 - リポジトリの秘密情報や実行時の認証情報を必要としません
 - 依存パッケージとパッケージ管理ツールを意図的に使用しません
 
 HTML内のContent Security Policyは有効な防御層ですが、HTTPレスポンスヘッダーの完全な代わりにはなりません。たとえばframe-ancestorsはmeta要素では適用されず、通常はHTTPヘッダーで設定します。GitHub Pagesで配信されるHTTPヘッダーは、このリポジトリの静的ファイルだけでは自由に設定できません。そのため、クリックジャッキング対策などを含む絶対的な安全性は主張しません。
+
+Permissions-PolicyはHTMLのhttp-equiv metaで代用しません。現在のサイトはJavaScript、フォーム、認証、決済、カメラ、マイク、位置情報などを使う機能自体を持たないため、追加の依存や別ホスティングを導入せず、攻撃対象領域を小さく保つ設計を優先します。将来これらの機能や、HTTPヘッダーでの厳格な埋め込み制御が必要になった場合は、Permissions-Policyやframe-ancestorsをレスポンスヘッダーで設定できる配信環境を先に検討します。
 
 robots.txt、ai.txt、sitemap.xmlは公開方針や発見可能性を伝える文書であり、認証、暗号化、アクセス制御ではありません。クローラーが指示に従うことを前提に秘密情報を置かず、リポジトリとGitHub Pagesで配信されるファイルはすべて公開情報として扱います。
 
@@ -55,11 +57,14 @@ AI I Love You is a static GitHub Pages site designed to minimize attack surface 
 - No forms, authentication, accounts, database, API, or server-side processing
 - No third-party assets, embeds, frames, analytics, advertisements, or external fonts
 - The HTML declares a Content Security Policy that rejects loads except for the site's own CSS
+- The project does not treat a Permissions-Policy meta element as an enforceable security control
 - GitHub Actions has read-only contents permission and receives no secrets
 - No repository secrets or runtime credentials are required
 - Dependencies and package managers are intentionally absent
 
 The HTML Content Security Policy is a useful defense layer but is not a complete replacement for HTTP response headers. For example, frame-ancestors is not enforced from a meta element and is normally configured as an HTTP header. HTTP headers delivered by GitHub Pages cannot be freely configured using only these static repository files. This project therefore makes no absolute security claim, including an absolute clickjacking-prevention claim.
+
+Permissions-Policy is not emulated with an http-equiv meta element. The current site has no JavaScript, forms, authentication, payments, camera, microphone, geolocation, or similar device-API features, so keeping the attack surface small is preferred over adding hosting complexity or dependencies. If such features or strict response-header framing controls become necessary later, first consider a hosting environment that can send real Permissions-Policy and frame-ancestors response headers.
 
 robots.txt, ai.txt, and sitemap.xml communicate publication policy or discoverability. They are not authentication, encryption, or access control. Do not place secrets on the assumption that crawlers will obey instructions. Treat every file in the repository and every file served by GitHub Pages as public information.
 
